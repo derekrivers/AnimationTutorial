@@ -8,6 +8,7 @@ using Android.OS;
 using System.Collections.Generic;
 using Android.Views.InputMethods;
 using Android.Views.Animations;
+using System.Linq;
 
 namespace AnimationTutorial
 {
@@ -20,6 +21,7 @@ namespace AnimationTutorial
         private LinearLayout mContainer;
         private bool mAnimatedDown;
         private bool mIsAnimating;
+        private FriendsAdapter mAdapter;
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -33,6 +35,8 @@ namespace AnimationTutorial
 
             mSearch.Alpha = 0; //Make it invisible (values between 0 through 1).
 
+            mSearch.TextChanged += MSearch_TextChanged;
+
 
             mFriends = new List<Friend>();
             mFriends.Add(new Friend { FirstName = "Bob", LastName = "Smith", Age = "33", Gender = "Male" });
@@ -43,10 +47,23 @@ namespace AnimationTutorial
             mFriends.Add(new Friend { FirstName = "Ruth", LastName = "White", Age = "81", Gender = "Female" });
             mFriends.Add(new Friend { FirstName = "Sally", LastName = "Johnson", Age = "54", Gender = "Female" });
 
-            FriendsAdapter adapter = new FriendsAdapter(this, Resource.Layout.row_friend, mFriends);
-            mListView.Adapter = adapter;
+            mAdapter = new FriendsAdapter(this, Resource.Layout.row_friend, mFriends);
+            mListView.Adapter = mAdapter;
         }
 
+        private void MSearch_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
+        {
+            List<Friend> searchedFriends = mFriends
+                .Where(
+                    x => x.FirstName.Contains(mSearch.Text, StringComparison.OrdinalIgnoreCase) || 
+                    x.LastName.Contains(mSearch.Text, StringComparison.OrdinalIgnoreCase) || 
+                    x.Age.Contains(mSearch.Text, StringComparison.OrdinalIgnoreCase) || 
+                    x.Gender.Contains(mSearch.Text, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            mAdapter = new FriendsAdapter(this, Resource.Layout.row_friend, searchedFriends);
+
+            mListView.Adapter = mAdapter;
+        }
 
         public override bool OnCreateOptionsMenu(IMenu menu)
         {
