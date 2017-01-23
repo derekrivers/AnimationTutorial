@@ -23,6 +23,18 @@ namespace AnimationTutorial
         private bool mIsAnimating;
         private FriendsAdapter mAdapter;
 
+        private TextView mTxtHeaderFirstName;
+        private TextView mTxtHeaderLastName;
+        private TextView mTxtHeaderAge;
+        private TextView mTxtHeaderGender;
+
+        private bool mFirstNameOrderAsc;
+        private bool mlastNameOrderAsc;
+        private bool mAgeOrderAsc;
+        private bool mGenderNameOrderAsc;
+
+
+
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
@@ -33,7 +45,18 @@ namespace AnimationTutorial
             mSearch = FindViewById<EditText>(Resource.Id.etSearch);
             mContainer = FindViewById<LinearLayout>(Resource.Id.llContainer);
 
+            mTxtHeaderFirstName = FindViewById<TextView>(Resource.Id.txtHeaderFirstName);
+            mTxtHeaderLastName = FindViewById<TextView>(Resource.Id.txtHeaderLastName);
+            mTxtHeaderAge = FindViewById<TextView>(Resource.Id.txtHeaderAge);
+            mTxtHeaderGender = FindViewById<TextView>(Resource.Id.txtHeaderGender);
+
+            mTxtHeaderFirstName.Click += MTxtHeaderFirstName_Click;
+            mTxtHeaderLastName.Click += MTxtHeaderLastName_Click;
+            mTxtHeaderAge.Click += MTxtHeaderAge_Click;
+            mTxtHeaderGender.Click += MTxtHeaderGender_Click;
+
             mSearch.Alpha = 0; //Make it invisible (values between 0 through 1).
+            mContainer.BringToFront();
 
             mSearch.TextChanged += MSearch_TextChanged;
 
@@ -49,6 +72,103 @@ namespace AnimationTutorial
 
             mAdapter = new FriendsAdapter(this, Resource.Layout.row_friend, mFriends);
             mListView.Adapter = mAdapter;
+        }
+
+        private void MTxtHeaderGender_Click(object sender, EventArgs e)
+        {
+            List<Friend> filteredFriends;
+
+            if (!mFirstNameOrderAsc)
+            {
+                filteredFriends = mFriends.OrderBy(x => x.Gender).ToList<Friend>();
+
+                mAdapter = new FriendsAdapter(this, Resource.Layout.row_friend, filteredFriends);
+
+                mListView.Adapter = mAdapter;
+            }
+            else
+            {
+                filteredFriends = mFriends.OrderByDescending(x => x.Gender).ToList<Friend>();
+
+                mAdapter = new FriendsAdapter(this, Resource.Layout.row_friend, filteredFriends);
+
+                mListView.Adapter = mAdapter;
+            }
+
+            mGenderNameOrderAsc = !mGenderNameOrderAsc;
+        }
+
+        private void MTxtHeaderAge_Click(object sender, EventArgs e)
+        {
+            List<Friend> filteredFriends;
+
+            if (!mFirstNameOrderAsc)
+            {
+                filteredFriends = mFriends.OrderBy(x => x.Age).ToList<Friend>();
+
+                mAdapter = new FriendsAdapter(this, Resource.Layout.row_friend, filteredFriends);
+
+                mListView.Adapter = mAdapter;
+            }
+            else
+            {
+                filteredFriends = mFriends.OrderByDescending(x => x.Age).ToList<Friend>();
+
+                mAdapter = new FriendsAdapter(this, Resource.Layout.row_friend, filteredFriends);
+
+                mListView.Adapter = mAdapter;
+            }
+
+            mAgeOrderAsc = !mAgeOrderAsc;
+        }
+
+        private void MTxtHeaderLastName_Click(object sender, EventArgs e)
+        {
+            List<Friend> filteredFriends;
+
+            if (!mFirstNameOrderAsc)
+            {
+                filteredFriends = mFriends.OrderBy(x => x.LastName).ToList<Friend>();
+
+                mAdapter = new FriendsAdapter(this, Resource.Layout.row_friend, filteredFriends);
+
+                mListView.Adapter = mAdapter;
+            }
+            else
+            {
+                filteredFriends = mFriends.OrderByDescending(x => x.LastName).ToList<Friend>();
+
+                mAdapter = new FriendsAdapter(this, Resource.Layout.row_friend, filteredFriends);
+
+                mListView.Adapter = mAdapter;
+            }
+
+            mlastNameOrderAsc = !mlastNameOrderAsc;
+        }
+
+        private void MTxtHeaderFirstName_Click(object sender, EventArgs e)
+        {
+            List<Friend> filteredFriends;
+
+            if (!mFirstNameOrderAsc)
+            {
+                filteredFriends = mFriends.OrderBy(x => x.FirstName).ToList<Friend>();
+
+                mAdapter = new FriendsAdapter(this, Resource.Layout.row_friend, filteredFriends);
+
+                mListView.Adapter = mAdapter;
+            }
+            else
+            {
+                filteredFriends = mFriends.OrderByDescending(x => x.FirstName).ToList<Friend>();
+
+                mAdapter = new FriendsAdapter(this, Resource.Layout.row_friend, filteredFriends);
+
+                mListView.Adapter = mAdapter;
+            }
+
+            mFirstNameOrderAsc = !mFirstNameOrderAsc;
+           
         }
 
         private void MSearch_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
@@ -77,6 +197,8 @@ namespace AnimationTutorial
             switch (item.ItemId)
             {
                 case Resource.Id.search:
+
+                    mSearch.Visibility = ViewStates.Visible;
 
                     if (mIsAnimating)
                     {
