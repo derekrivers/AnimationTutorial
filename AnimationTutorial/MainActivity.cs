@@ -18,6 +18,8 @@ namespace AnimationTutorial
         private ListView mListView;
         private EditText mSearch;
         private LinearLayout mContainer;
+        private bool mAnimatedDown;
+        private bool mIsAnimating;
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -29,7 +31,7 @@ namespace AnimationTutorial
             mSearch = FindViewById<EditText>(Resource.Id.etSearch);
             mContainer = FindViewById<LinearLayout>(Resource.Id.llContainer);
 
-            mSearch.Alpha = 0;
+            mSearch.Alpha = 0; //Make it invisible (values between 0 through 1).
 
 
             mFriends = new List<Friend>();
@@ -58,24 +60,68 @@ namespace AnimationTutorial
             switch (item.ItemId)
             {
                 case Resource.Id.search:
-          
+
+                    if (mIsAnimating)
+                    {
+                        return true;
+                    }
+
+                    if (!mAnimatedDown)
+                    {
                         MyAnimation anim = new MyAnimation(mListView, mListView.Height - mSearch.Height);
                         anim.Duration = 500;
                         mListView.StartAnimation(anim);
                         anim.AnimationStart += Anim_AnimationStartDown;
+                        anim.AnimationEnd += Anim_AnimationEndDown;
+
+                        mContainer.Animate().TranslationYBy(mSearch.Height).SetDuration(500).Start();
+             
+      
+                    }
+                    else
+                    {
+                        MyAnimation anim = new MyAnimation(mListView, mListView.Height + mSearch.Height);
+                        anim.Duration = 500;
+                        mListView.StartAnimation(anim);
+                        anim.AnimationStart += Anim_AnimationStartUp;
+                        anim.AnimationEnd += Anim_AnimationEndUp;
+
                         mContainer.Animate().TranslationYBy(-mSearch.Height).SetDuration(500).Start();
-                        return true;
-                    
-                   
+                        //ListView is down.
+                    }
+
+                    mAnimatedDown = !mAnimatedDown;
+
+                    return true;
+
                 default:
                     return base.OnOptionsItemSelected(item);
             }
         }
 
+        private void Anim_AnimationEndUp(object sender, Animation.AnimationEndEventArgs e)
+        {
+            mIsAnimating = false;
+            mSearch.ClearFocus();
+            InputMethodManager inputManager = (InputMethodManager)this.GetSystemService(Context.InputMethodService);
+            inputManager.HideSoftInputFromWindow(this.CurrentFocus.WindowToken, HideSoftInputFlags.NotAlways);
+        }
+
+        private void Anim_AnimationEndDown(object sender, Animation.AnimationEndEventArgs e)
+        {
+            mIsAnimating = false;
+        }
 
         private void Anim_AnimationStartDown(object sender, Android.Views.Animations.Animation.AnimationStartEventArgs e)
         {
-            throw new NotImplementedException();
+            mIsAnimating = true;
+            mSearch.Animate().AlphaBy(1.0f).SetDuration(500).Start();
+        }
+
+        private void Anim_AnimationStartUp(object sender, Android.Views.Animations.Animation.AnimationStartEventArgs e)
+        {
+            mIsAnimating = true;
+            mSearch.Animate().AlphaBy(-1.0f).SetDuration(300).Start();
         }
     }
 }
